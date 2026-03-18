@@ -87,6 +87,7 @@ function renderQBank(){
 function genCode(){return String(Math.floor(1000+Math.random()*9000));}
 
 async function createSession(){
+    console.log("ADMIN CODE:", aCode);
   const label=document.getElementById('new-client').value.trim()||'عميل';
   const qc=parseInt(document.getElementById('new-qcount').value)||5;
   if(!G.qBank.length){toast('❗ أضف أسئلة أولاً');return;}
