@@ -151,44 +151,111 @@ async function playerJoin(){
 
 async function clientJoin(){
   const code=document.getElementById('cCode').value.trim();
-  if(!/^\d{4}$/.test(code)){toast('❗ الكود 4 أرقام');return;}
-  let sd=null,isAdm=false;
-  if(G.sb&&!G.demo){
-    // 1) ابحث بعمود admin_code المنفصل
-    const {data:aRow}=await G.sb.from('sessions').select('*').eq('admin_code',code).maybeSingle();
-    if(aRow){
-      sd=aRow;isAdm=true;G.playerCode=aRow.code;
-    } else {
-      // 2) ابحث داخل JSON state->adminCode (للجلسات القديمة)
-      const {data:jRow}=await G.sb.from('sessions').select('*').filter('state->>adminCode','eq',code).maybeSingle();
-      if(jRow){
-        sd=jRow;isAdm=true;G.playerCode=jRow.code;
-      } else {
-        // 3) ابحث بكود اللاعبين (مشاهد)
-        const {data:pRow,error}=await G.sb.from('sessions').select('*').eq('code',code).maybeSingle();
-        if(error||!pRow){toast('❌ الكود غير موجود');return;}
-        sd=pRow;isAdm=false;G.playerCode=code;
+  if(!/^\d{4}$/.test(code)){
+    toast('❗ الكود 4 أرقام');
+    return;
+  }
+
+  let sessionData=null;
+  let isAdmin=false;
+
+  if(G.sb && !G.demo){
+
+    // 🔴 1. تحقق من admin_code
+    const { data: adminMatch } = await G.sb
+      .from('sessions')
+      .select('*')
+      .eq('admin_code', code)
+      .maybeSingle();
+
+    if(adminMatch){
+      sessionData = adminMatch;
+      isAdmin = true;
+    }
+
+    // 🔵 2. تحقق من state.adminCode
+    if(!sessionData){
+      const { data: jsonMatch } = await G.sb
+        .from('sessions')
+        .select('*')
+        .filter('state->>adminCode','eq',code)
+        .maybeSingle();
+
+      if(jsonMatch){
+        sessionData = jsonMatch;
+        isAdmin = true;
       }
     }
+
+    // 🟡 3. تحقق من كود اللاعبين
+    if(!sessionData){
+      const { data: playerMatch } = await G.sb
+        .from('sessions')
+        .select('*')
+        .eq('code', code)
+        .maybeSingle();
+
+      if(playerMatch){
+        sessionData = playerMatch;
+        isAdmin = false;
+      }
+    }
+
+    if(!sessionData){
+      toast('❌ الكود غير موجود');
+      return;
+    }
+
   } else {
-    const byA=G.sessions.find(s=>s.admin_code===code||s.state?.adminCode===code);
-    if(byA){sd=byA;isAdm=true;G.playerCode=byA.code;}
-    else{const byP=G.sessions.find(s=>s.code===code);if(!byP){toast('❌ الكود غير موجود');return;}sd=byP;isAdm=false;G.playerCode=code;}
+    // وضع الديمو
+    const byAdmin = G.sessions.find(s => 
+      s.admin_code === code || s.state?.adminCode === code
+    );
+
+    if(byAdmin){
+      sessionData = byAdmin;
+      isAdmin = true;
+    } else {
+      const byPlayer = G.sessions.find(s => s.code === code);
+      if(!byPlayer){
+        toast('❌ الكود غير موجود');
+        return;
+      }
+      sessionData = byPlayer;
+      isAdmin = false;
+    }
   }
-  G.sessionCode=code;G.isAdmin=isAdm;
-  const st=sd?.state||{};
-  G.sessionTimer=sd?.timer_seconds||st.timerSeconds||10;
-  G.questions=st.questions||[];
-  if(isAdm){
-    document.getElementById('ca-code').textContent=G.playerCode;
-    caUpdateUI(st);
-    if(G.sb&&!G.demo)subSession(G.playerCode,'cadmin');
-    go('s-cadmin');toast('✅ مرحباً أيها المضيف!');
+
+  // ✅ ضبط القيم
+  G.sessionCode = sessionData.code;
+  G.playerCode = sessionData.code;
+  G.isAdmin = isAdmin;
+
+  const state = sessionData.state || {};
+  G.questions = state.questions || [];
+  G.sessionTimer = sessionData.timer_seconds || state.timerSeconds || 10;
+
+  // ✅ توجيه المستخدم
+  if(isAdmin){
+    document.getElementById('ca-code').textContent = G.playerCode;
+    caUpdateUI(state);
+
+    if(G.sb && !G.demo){
+      subSession(G.playerCode,'cadmin');
+    }
+
+    go('s-cadmin');
+    toast('🎮 دخلت كـ أدمن');
   } else {
-    applyState(st,'client');
-    if(G.sb&&!G.demo)subSession(code,'client');
-    document.getElementById('cl-code').textContent=code;
-    go('s-client');toast('✅ وضع المشاهدة');
+    applyState(state,'client');
+
+    if(G.sb && !G.demo){
+      subSession(G.playerCode,'client');
+    }
+
+    document.getElementById('cl-code').textContent = G.playerCode;
+    go('s-client');
+    toast('👀 وضع المشاهدة');
   }
 }
 
