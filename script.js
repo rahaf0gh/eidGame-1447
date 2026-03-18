@@ -87,7 +87,6 @@ function renderQBank(){
 function genCode(){return String(Math.floor(1000+Math.random()*9000));}
 
 async function createSession(){
-    console.log("ADMIN CODE:", aCode);
   const label=document.getElementById('new-client').value.trim()||'عميل';
   const qc=parseInt(document.getElementById('new-qcount').value)||5;
   if(!G.qBank.length){toast('❗ أضف أسئلة أولاً');return;}
@@ -113,6 +112,9 @@ const init={
   const msg=`مثّل 🪔 — ${label}\n\n👥 كود اللاعبين: ${pCode}\n🎮 كود المضيف (أنت): ${aCode}\n⏱ وقت كل سؤال: ${G.pendingTimer} ثانية\n⚡ النقاط = الوقت المتبقي (أسرع = أكثر!)\n\n🔗 الرابط: ${url}\n\nاللاعبون: تاب "انضم للعبة"\nالمضيف: تاب "مشاهد / أدمن" بكود المضيف`;
   navigator.clipboard.writeText(msg).catch(()=>{});
   toast(`✅ ${pCode} (لاعبين) / ${aCode} (مضيف)`);
+
+      console.log("ADMIN CODE:", aCode);
+
 }
 
 function renderSessions(){
