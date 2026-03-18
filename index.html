@@ -351,7 +351,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--parch);}
       <div class="sb-note"><strong>supabase.com</strong> → مشروع جديد → Settings → API → انسخ URL + anon key</div>
       <input class="oi" id="sb-url" placeholder="https://xxxx.supabase.co" type="url">
       <input class="oi" id="sb-key" placeholder="eyJ... (anon key)" style="margin-bottom:8px">
-      <div style="display:flex;gap:7px"><button class="ob gold" style="flex:1;padding:12px" onclick="connectSB()">🔗 اتصل</button><button class="ob ghost" style="flex:1;padding:12px" onclick="enableDemo()">🎮 تجربة محلية</button></div>
+      <div style="display:flex;gap:7px"><button class="ob gold" style="flex:1;padding:12px" onclick="connectSB_owner()">🔗 اتصل</button><button class="ob ghost" style="flex:1;padding:12px" onclick="enableDemo()">🎮 تجربة محلية</button></div>
       <div id="sb-st" style="font-size:11px;text-align:center;margin-top:7px;color:var(--mu)"></div>
     </div>
     <div class="oc" id="oc-qbank" style="display:none">
@@ -561,14 +561,11 @@ async function clientJoin(){
   if(!/^\d{4}$/.test(code)){toast('❗ الكود 4 أرقام');return;}
   let sd=null,isAdm=false;
   if(G.sb&&!G.demo){
-    // DEBUG — شوف وش يرجع
-    const {data:aRow, error:aErr}=await G.sb.from('sessions').select('*').eq('admin_code',code).maybeSingle();
-    console.log('admin_code search:', code, '→ data:', aRow, 'error:', aErr);
+    const {data:aRow}=await G.sb.from('sessions').select('*').eq('admin_code',code).maybeSingle();
     if(aRow){
       sd=aRow;isAdm=true;G.playerCode=aRow.code;
     } else {
-      const {data:pRow, error:pErr}=await G.sb.from('sessions').select('*').eq('code',code).maybeSingle();
-      console.log('player_code search:', code, '→ data:', pRow, 'error:', pErr);
+      const {data:pRow}=await G.sb.from('sessions').select('*').eq('code',code).maybeSingle();
       if(!pRow){toast('❌ الكود غير موجود');return;}
       sd=pRow;isAdm=false;G.playerCode=code;
     }
@@ -844,6 +841,43 @@ function resetAll(){G.sessionCode=null;G.playerCode=null;G.isAdmin=false;G.pName
 
 let _tt;
 function toast(msg){clearTimeout(_tt);const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');_tt=setTimeout(()=>el.classList.remove('show'),2800);}
+
+// ── حفظ بيانات Supabase واسترجاعها تلقائياً ──
+async function initSupabase(url, key){
+  try{
+    const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+    G.sb=createClient(url,key);
+    // تحقق سريع
+    const {error}=await G.sb.from('sessions').select('code').limit(1);
+    if(error&&!['PGRST116','42P01'].includes(error.code))throw error;
+    return true;
+  }catch(e){G.sb=null;return false;}
+}
+
+async function connectSB_owner(){
+  const url=document.getElementById('sb-url').value.trim(),key=document.getElementById('sb-key').value.trim(),st=document.getElementById('sb-st');
+  if(!url||!key){toast('❗ أدخل URL و key');return;}
+  st.textContent='⏳ جاري الاتصال...';
+  const ok=await initSupabase(url,key);
+  if(ok){
+    localStorage.setItem('sb_url',url);
+    localStorage.setItem('sb_key',key);
+    st.textContent='✅ متصل!';st.style.color='#189040';
+    toast('✅ متصل!');activateOwner();
+  }else{
+    st.textContent='❌ فشل الاتصال';st.style.color='#C43020';
+  }
+}
+
+// اتصل تلقائياً عند فتح الصفحة لو فيه بيانات محفوظة
+(async()=>{
+  const url=localStorage.getItem('sb_url');
+  const key=localStorage.getItem('sb_key');
+  if(url&&key){
+    await initSupabase(url,key);
+    // لا نفتح لوحة المالك تلقائياً — بس G.sb يكون جاهزاً للعملاء واللاعبين
+  }
+})();
 
 const urlCode=new URLSearchParams(location.search).get('code');
 if(urlCode){document.getElementById('pCode').value=urlCode;toast('✅ كود: '+urlCode+' — أدخل اسمك وانضم!');}
