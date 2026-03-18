@@ -405,6 +405,11 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--parch);}
 <div class="toast" id="toast"></div>
 
 <script>
+
+const SB_URL = 'https://dezmevxikpvhiqycdsph.supabase.co';  
+const SB_KEY = 'sb_publishable_luzqvznDRSePriVb4oVhVA_0EBBILPY'; 
+// ════════════════════════════════════════════════════
+
 const G={
   sb:null,demo:false,ch:null,
   OWNER_SECRET:'0000',
@@ -417,6 +422,16 @@ const G={
   pendingImg:null,pendingCT:'image',pendingAT:'text',pendingTimer:10,
   mcqOpts:['','','',''],mcqCorrect:0,
 };
+
+// اتصال تلقائي عند فتح الصفحة
+async function autoConnect(){
+  if(!SB_URL||!SB_KEY)return; // لو فارغ ما يتصل
+  try{
+    const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+    G.sb=createClient(SB_URL,SB_KEY);
+  }catch(e){G.sb=null;}
+}
+autoConnect(); // يشتغل فوراً عند تحميل الصفحة
 
 function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');}
 function swTab(el,id){el.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');['tp','tc'].forEach(t=>document.getElementById(t).style.display=t===id?'block':'none');}
@@ -538,6 +553,14 @@ async function playerJoin(){
   const name=document.getElementById('pName').value.trim(),code=document.getElementById('pCode').value.trim();
   if(!name){toast('❗ أدخل اسمك');return;}
   if(!/^\d{4}$/.test(code)){toast('❗ الكود 4 أرقام');return;}
+
+  // انتظر الاتصال لو لم يكتمل
+  if(!G.sb&&!G.demo){
+    toast('⏳ جاري الاتصال...');
+    await new Promise(r=>setTimeout(r,2000));
+    if(!G.sb){toast('❌ تعذر الاتصال — تأكد من إعداد Supabase');return;}
+  }
+
   let st=null;
   if(G.sb&&!G.demo){
     const {data,error}=await G.sb.from('sessions').select('*').eq('code',code).maybeSingle();
@@ -559,6 +582,14 @@ async function playerJoin(){
 async function clientJoin(){
   const code=document.getElementById('cCode').value.trim();
   if(!/^\d{4}$/.test(code)){toast('❗ الكود 4 أرقام');return;}
+
+  // لو Supabase لم يتصل بعد، انتظر حتى ثانيتين
+  if(!G.sb&&!G.demo){
+    toast('⏳ جاري الاتصال...');
+    await new Promise(r=>setTimeout(r,2000));
+    if(!G.sb){toast('❌ تعذر الاتصال — تأكد من إعداد Supabase');return;}
+  }
+
   let sd=null,isAdm=false;
   if(G.sb&&!G.demo){
     const {data:aRow}=await G.sb.from('sessions').select('*').eq('admin_code',code).maybeSingle();
