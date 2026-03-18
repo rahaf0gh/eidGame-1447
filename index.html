@@ -2,11 +2,10 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>مثّل</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=Cairo:wght@700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-
 </head>
 <body>
 <div class="bg"></div>
@@ -17,22 +16,20 @@
     <div class="logo"><span class="flame">🪔</span><div class="logo-w">مَثِّل</div><div class="logo-s">اكتشف المثل من الصورة</div></div>
     <div class="tabs">
       <button class="tab on" onclick="swTab(this,'tp')">انضم للعبة</button>
-      <button class="tab" onclick="swTab(this,'tc')">مشاهد / أدمن</button>
+      <button class="tab"    onclick="swTab(this,'tc')">مشاهد / أدمن</button>
     </div>
     <div id="tp">
       <label class="lbl">اسمك</label>
       <input class="inp" id="pName" type="text" placeholder="أدخل اسمك" maxlength="20">
       <label class="lbl">كود الجلسة</label>
-      <!-- الكود السري للمالك يُدخل هنا — لا يعلم به أحد -->
-      <input class="inp code" id="pCode" type="tel" placeholder="1234" maxlength="4"
-             oninput="checkOwnerCode(this.value)">
+      <input class="inp code" id="pCode" type="tel" placeholder="1234" maxlength="4" oninput="checkOwner(this.value)">
       <button class="btn gold" onclick="playerJoin()">🚪 انضم الآن</button>
     </div>
     <div id="tc" style="display:none">
-      <label class="lbl">كود جلستك</label>
+      <label class="lbl">كودك الخاص</label>
       <input class="inp code" id="cCode" type="tel" placeholder="1234" maxlength="4">
       <button class="btn gold" onclick="clientJoin()">دخول</button>
-      <div style="font-size:11px;color:var(--ink2);text-align:center;margin-top:-4px">العميل الذي اشترى الجلسة يدخل هنا بكوده الخاص</div>
+      <div style="font-size:11px;color:var(--ink2);text-align:center;margin-top:-4px">العميل يدخل بكود المضيف • اللاعبون من تاب "انضم"</div>
     </div>
   </div>
 </div>
@@ -43,15 +40,15 @@
     <div class="logo" style="margin-bottom:12px"><span style="font-size:36px">👥</span><div class="logo-w" style="font-size:24px">اختر فريقك</div></div>
     <div class="sbanner"><div class="sb-lbl">كود الجلسة</div><div class="sb-code" id="tm-code">----</div><div class="sb-hint">شارك الكود مع باقي اللاعبين</div></div>
     <div class="teams">
-      <div class="tbox r" id="tb-r" onclick="pickTeam('red')"><div class="tbox-icon">🔴</div><div class="tbox-nm">الفريق الأحمر</div><div class="tbox-ct" id="tc-r">0 لاعب</div></div>
-      <div class="tbox b" id="tb-b" onclick="pickTeam('blue')"><div class="tbox-icon">🔵</div><div class="tbox-nm">الفريق الأزرق</div><div class="tbox-ct" id="tc-b">0 لاعب</div></div>
+      <div class="tbox r" id="tb-r" onclick="pickTeam('red')"><div class="tbox-ic">🔴</div><div class="tbox-nm">الفريق الأحمر</div><div class="tbox-ct" id="tc-r">0 لاعب</div></div>
+      <div class="tbox b" id="tb-b" onclick="pickTeam('blue')"><div class="tbox-ic">🔵</div><div class="tbox-nm">الفريق الأزرق</div><div class="tbox-ct" id="tc-b">0 لاعب</div></div>
     </div>
     <div id="start-wrap" style="display:none;margin-top:4px">
       <button class="btn gold" onclick="startGame()">▶ ابدأ اللعبة!</button>
       <div style="font-size:11px;color:var(--ink2);text-align:center;margin-top:-4px">كلا الفريقين جاهزان ✓</div>
     </div>
     <div id="wait-wrap" style="text-align:center;margin-top:12px">
-      <div style="font-size:12px;color:var(--ink2);margin-bottom:10px">في انتظار انضمام الفريقين...</div>
+      <div style="font-size:12px;color:var(--ink2);margin-bottom:10px">في انتظار الفريقين...</div>
       <div class="wdots"><div class="wd"></div><div class="wd"></div><div class="wd"></div></div>
     </div>
   </div>
@@ -60,132 +57,84 @@
 <!-- GAME -->
 <div class="screen" id="s-game">
   <div class="card" style="max-width:500px">
-    <div class="scorebar">
-      <div class="sbt r"><div class="sbt-lbl">🔴 الأحمر</div><div class="sbt-n" id="g-rs">0</div></div>
+    <div class="sbar">
+      <div class="sbt r" id="sbt-r"><div class="sbt-lb">🔴 الأحمر</div><div class="sbt-n" id="g-rs">0</div><div class="sbt-pt">نقطة</div></div>
       <div class="sb-mid"></div>
-      <div class="sbt b"><div class="sbt-lbl">🔵 الأزرق</div><div class="sbt-n" id="g-bs">0</div></div>
+      <div class="sbt b" id="sbt-b"><div class="sbt-lb">🔵 الأزرق</div><div class="sbt-n" id="g-bs">0</div><div class="sbt-pt">نقطة</div></div>
     </div>
     <div class="rrow"><span class="badge gold" id="g-badge">السؤال 1</span><span class="live">مباشر</span></div>
     <div class="qbox" id="g-qbox"><div class="qph"><span class="qph-i">🖼️</span><p>سيظهر السؤال هنا</p></div></div>
+    <div class="q-tbox" id="g-tbox"><div class="q-tbox-l">السؤال</div><div class="q-tbox-c" id="g-tbox-c"></div></div>
     <div id="g-timer" style="display:none">
       <div class="timer-wrap"><div class="timer-track"><div class="timer-fill" id="g-tf" style="width:100%"></div></div><div class="timer-num" id="g-tn">30</div></div>
     </div>
-    <div id="g-text-ans">
-      <label class="lbl" style="color:#8A5C20">اكتب المثل</label>
-      <div class="ans-row"><input class="inp" id="g-ans" type="text" placeholder="اكتب المثل هنا..." style="margin-bottom:0" onkeydown="if(event.key==='Enter')sendAns()"><button class="btn gold sm" onclick="sendAns()">✓</button></div>
+    <div id="g-ans-wrap">
+      <label class="lbl" style="color:#8A5C20">اكتب الإجابة</label>
+      <div class="ans-row"><input class="inp" id="g-ans" type="text" placeholder="اكتب المثل..." style="margin-bottom:0" onkeydown="if(event.key==='Enter')sendAns()"><button class="btn gold sm" onclick="sendAns()">✓</button></div>
     </div>
-    <div id="g-mcq-ans" style="display:none">
+    <div id="g-mcq-wrap" style="display:none">
       <label class="lbl" style="color:#8A5C20">اختر الإجابة</label>
       <div class="mcq-grid" id="g-mcq-grid"></div>
     </div>
     <div id="g-result" style="display:none"></div>
-    <div id="g-state" style="display:none"><div class="state-msg"><div class="state-icon" id="g-st-i">⏳</div><div class="state-title" id="g-st-t">انتظر...</div><div class="state-sub" id="g-st-s"></div></div></div>
+    <div id="g-state" style="display:none"><div class="state-msg"><div class="state-ic" id="g-si">⏳</div><div class="state-title" id="g-st">انتظر...</div><div class="state-sub" id="g-ss"></div></div></div>
   </div>
 </div>
 
-<!-- CLIENT -->
+<!-- CLIENT SPECTATOR -->
 <div class="screen" id="s-client">
   <div class="card">
     <div class="logo" style="margin-bottom:12px"><span style="font-size:36px">🎟️</span><div class="logo-w" style="font-size:22px">جلستك</div></div>
     <div class="sbanner"><div class="sb-lbl">شارك الكود مع المشاركين</div><div class="sb-code" id="cl-code">----</div></div>
-    <button onclick="copyLink()" style="width:100%;background:rgba(184,138,10,.1);border:1px solid rgba(184,138,10,.25);border-radius:10px;padding:11px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;color:var(--goldhi);cursor:pointer;margin-bottom:12px;">📋 انسخ الرابط + الكود</button>
-    <div class="scorebar"><div class="sbt r"><div class="sbt-lbl">🔴 الأحمر</div><div class="sbt-n" id="cl-rs">0</div></div><div class="sb-mid"></div><div class="sbt b"><div class="sbt-lbl">🔵 الأزرق</div><div class="sbt-n" id="cl-bs">0</div></div></div>
+    <button class="copy-btn" onclick="copyLink()">📋 انسخ الرابط + الكود</button>
+    <div class="sbar"><div class="sbt r"><div class="sbt-lb">🔴 الأحمر</div><div class="sbt-n" id="cl-rs">0</div><div class="sbt-pt">نقطة</div></div><div class="sb-mid"></div><div class="sbt b"><div class="sbt-lb">🔵 الأزرق</div><div class="sbt-n" id="cl-bs">0</div><div class="sbt-pt">نقطة</div></div></div>
     <div id="cl-status" style="text-align:center;font-size:13px;color:var(--ink2);padding:8px 0">في انتظار بدء اللعبة...</div>
     <div class="wdots"><div class="wd"></div><div class="wd"></div><div class="wd"></div></div>
   </div>
 </div>
 
-<!-- CLIENT ADMIN — أدمن الجلسة (العميل) -->
+<!-- CLIENT ADMIN -->
 <div class="screen" id="s-cadmin">
   <div class="ow" style="max-width:520px">
-
-    <div class="ow-bar">
-      <div class="ow-title">🎮 إدارة اللعبة</div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <span class="live">مباشر</span>
-        <button class="ob ghost" style="padding:6px 12px;font-size:11px" onclick="go('s-land');resetAll()">خروج</button>
-      </div>
-    </div>
-
-    <!-- Session code display -->
-    <div class="oc" style="background:rgba(184,138,10,.06);border-color:rgba(184,138,10,.2)">
-      <div class="oc-lbl">كود جلستك — شاركه مع اللاعبين</div>
+    <div class="ow-bar"><div class="ow-title">🎮 إدارة اللعبة</div><div style="display:flex;align-items:center;gap:10px"><span class="live">مباشر</span><button class="ob ghost" style="padding:6px 12px;font-size:11px" onclick="go('s-land');resetAll()">خروج</button></div></div>
+    <div class="oc" style="background:rgba(192,144,16,.06);border-color:rgba(192,144,16,.2)">
+      <div class="oc-lbl">كود اللاعبين — وزّعه على المشاركين</div>
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div style="font-family:'Cairo',sans-serif;font-size:38px;font-weight:900;color:var(--goldhi);letter-spacing:8px" id="ca-code">----</div>
-        <button class="ob ghost" onclick="caCopyLink()" style="font-size:12px">📋 نسخ الرابط</button>
+        <button class="ob ghost" onclick="copyLink()" style="font-size:12px">📋 نسخ</button>
       </div>
+      <div style="font-size:11px;color:rgba(192,144,16,.5);margin-top:4px">⚡ النقاط حسب السرعة — الوقت المتبقي = النقاط</div>
     </div>
-
-    <!-- Scores -->
-    <div class="scorebar" style="margin-bottom:12px">
-      <div class="sbt r"><div class="sbt-lbl">🔴 الأحمر</div><div class="sbt-n" id="ca-rs">0</div></div>
-      <div class="sb-mid"></div>
-      <div class="sbt b"><div class="sbt-lbl">🔵 الأزرق</div><div class="sbt-n" id="ca-bs">0</div></div>
-    </div>
-
-    <!-- Players -->
-    <div class="oc" id="ca-players-card">
-      <div class="oc-lbl">اللاعبون المنضمون</div>
+    <div class="sbar" style="margin-bottom:12px"><div class="sbt r"><div class="sbt-lb">🔴 الأحمر</div><div class="sbt-n" id="ca-rs">0</div><div class="sbt-pt">نقطة</div></div><div class="sb-mid"></div><div class="sbt b"><div class="sbt-lb">🔵 الأزرق</div><div class="sbt-n" id="ca-bs">0</div><div class="sbt-pt">نقطة</div></div></div>
+    <div class="oc">
+      <div class="oc-lbl">اللاعبون — السؤال <span id="ca-qn">1</span>/<span id="ca-qt">-</span></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
-        <div style="background:rgba(152,32,16,.1);border-radius:10px;padding:11px">
-          <div style="font-size:10px;font-weight:800;color:var(--red2);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px">الأحمر</div>
-          <div id="ca-rp"><span style="font-size:11px;color:var(--muted)">—</span></div>
-        </div>
-        <div style="background:rgba(20,36,96,.12);border-radius:10px;padding:11px">
-          <div style="font-size:10px;font-weight:800;color:var(--blue2);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px">الأزرق</div>
-          <div id="ca-bp"><span style="font-size:11px;color:var(--muted)">—</span></div>
-        </div>
+        <div style="background:rgba(150,32,16,.1);border-radius:10px;padding:11px"><div style="font-size:10px;font-weight:800;color:var(--red2);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px">الأحمر</div><div id="ca-rp"><span style="font-size:11px;color:var(--mu)">—</span></div></div>
+        <div style="background:rgba(20,32,96,.12);border-radius:10px;padding:11px"><div style="font-size:10px;font-weight:800;color:var(--blue2);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px">الأزرق</div><div id="ca-bp"><span style="font-size:11px;color:var(--mu)">—</span></div></div>
       </div>
     </div>
-
-    <!-- Current Question -->
-    <div class="oc" id="ca-q-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div class="oc-lbl" style="margin-bottom:0">السؤال الحالي</div>
-        <span style="font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;color:var(--gold2)" id="ca-q-num">1 / -</span>
-      </div>
-      <!-- Question image preview -->
-      <div id="ca-q-img" style="width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.04);border:1px solid var(--border);margin-bottom:10px;display:flex;align-items:center;justify-content:center">
-        <span style="font-size:32px;color:var(--muted)">🖼️</span>
-      </div>
-      <!-- Answers coming in -->
+    <div class="oc">
+      <div class="oc-lbl">السؤال الحالي</div>
+      <div id="ca-q-prev" style="font-size:13px;color:var(--mu);margin-bottom:10px">—</div>
       <div class="oc-lbl" style="margin-top:4px">إجابات الفرق</div>
-      <div id="ca-answers">
-        <div style="font-size:12px;color:var(--muted);padding:6px 0">في انتظار الإجابات...</div>
-      </div>
-      <!-- Correct answer reveal -->
-      <div id="ca-correct-wrap" style="margin-top:10px;padding:10px;background:rgba(24,136,60,.08);border-radius:10px;border:1px solid rgba(24,136,60,.2);display:none">
+      <div id="ca-ans-list"><div style="font-size:12px;color:var(--mu);padding:6px 0">في انتظار الإجابات...</div></div>
+      <div id="ca-rev-wrap" style="display:none;margin-top:10px;padding:10px;background:rgba(24,144,64,.08);border-radius:10px;border:1px solid rgba(24,144,64,.2)">
         <div style="font-size:10px;font-weight:800;color:var(--green2);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">الإجابة الصحيحة</div>
-        <div id="ca-correct-ans" style="font-size:15px;font-weight:800;color:var(--parch)"></div>
+        <div id="ca-rev-ans" style="font-size:15px;font-weight:800;color:var(--parch)"></div>
       </div>
     </div>
-
-    <!-- Controls -->
     <div class="oc">
       <div class="oc-lbl">التحكم</div>
-      <!-- Pre-game -->
-      <div id="ca-ctrl-lobby">
-        <button class="ob gold" style="width:100%;padding:13px;font-size:15px" onclick="caStart()">▶ ابدأ اللعبة</button>
-        <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:6px">تأكد من انضمام الفريقين أولاً</div>
+      <div id="ca-lobby"><button class="ob gold" style="width:100%;padding:13px;font-size:15px" onclick="caStart()">▶ ابدأ اللعبة</button><div style="font-size:11px;color:var(--mu);text-align:center;margin-top:6px">تأكد من انضمام الفريقين أولاً</div></div>
+      <div id="ca-game" style="display:none">
+        <div class="og2" style="margin-bottom:7px"><button class="ob gold" onclick="caReveal()">👁 كشف الإجابة</button><button class="ob ghost" onclick="caNext()">⏭ التالي</button></div>
+        <div class="og2"><button class="ob red" onclick="caPoint('red')">+نقاط 🔴</button><button class="ob blue" onclick="caPoint('blue')">+نقاط 🔵</button></div>
       </div>
-      <!-- In-game -->
-      <div id="ca-ctrl-game" style="display:none">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px">
-          <button class="ob gold" onclick="caReveal()">👁 كشف الإجابة</button>
-          <button class="ob ghost" onclick="caNext()">⏭ السؤال التالي</button>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
-          <button class="ob" style="background:linear-gradient(135deg,var(--red2),var(--red));color:white" onclick="caPoint('red')">+1 نقطة 🔴</button>
-          <button class="ob" style="background:linear-gradient(135deg,var(--blue2),var(--blue));color:white" onclick="caPoint('blue')">+1 نقطة 🔵</button>
-        </div>
-      </div>
-      <!-- End game -->
       <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:7px">
-        <button class="ob ghost" id="ca-restart-btn" style="display:none" onclick="caRestart()">🔄 إعادة اللعبة</button>
-        <button class="ob" style="background:rgba(152,32,16,.3);color:var(--red2);border:1px solid rgba(152,32,16,.3)" onclick="caEnd()">🏁 إنهاء اللعبة</button>
+        <button class="ob ghost" id="ca-restart" style="display:none" onclick="caRestart()">🔄 إعادة</button>
+        <button class="ob" style="background:rgba(150,32,16,.3);color:var(--red2);border:1px solid rgba(150,32,16,.3)" onclick="caEnd()">🏁 إنهاء</button>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -194,13 +143,10 @@
   <div class="card" style="max-width:500px">
     <div class="win-top"><span class="win-trophy" id="w-trophy">🏆</span><div class="win-title" id="w-title">الفريق فاز!</div><div class="win-sub" id="w-sub">مبروك 🎉</div></div>
     <div class="final-row">
-      <div class="fbox r" id="fb-r"><div class="fbox-nm">🔴 الأحمر</div><div class="fbox-sc" id="fw-r">0</div><div id="fw-rc"></div></div>
-      <div class="fbox b" id="fb-b"><div class="fbox-nm">🔵 الأزرق</div><div class="fbox-sc" id="fw-b">0</div><div id="fw-bc"></div></div>
+      <div class="fbox r" id="fb-r"><div class="fbox-nm">🔴 الأحمر</div><div class="fbox-sc" id="fw-r">0</div><div class="fbox-pt" id="fw-rc"></div></div>
+      <div class="fbox b" id="fb-b"><div class="fbox-nm">🔵 الأزرق</div><div class="fbox-sc" id="fw-b">0</div><div class="fbox-pt" id="fw-bc"></div></div>
     </div>
-    <div style="margin-bottom:10px">
-      <button class="hist-toggle" onclick="toggleHist()"><span>📋 تفاصيل كل سؤال</span><span id="h-arrow">▼</span></button>
-      <div class="hist-body" id="hist-body"></div>
-    </div>
+    <div style="margin-bottom:10px"><button class="hist-toggle" onclick="toggleHist()"><span>📋 تفاصيل كل سؤال</span><span id="h-ar">▼</span></button><div class="hist-body" id="hist-body"></div></div>
     <button class="btn gold" onclick="go('s-land');resetAll()">🔄 جلسة جديدة</button>
   </div>
 </div>
@@ -208,57 +154,59 @@
 <!-- OWNER -->
 <div class="screen" id="s-owner">
   <div class="ow">
-    <div class="ow-bar">
-      <div class="ow-title">🎛️ لوحة المالك</div>
-      <div style="display:flex;align-items:center;gap:10px"><span class="live">مباشر</span><button class="ob ghost" style="padding:6px 12px;font-size:11px" onclick="go('s-land')">خروج</button></div>
-    </div>
-
-    <!-- Supabase -->
-    <div class="oc" id="sb-cfg" style="background:rgba(184,138,10,.05);border-color:rgba(184,138,10,.18)">
+    <div class="ow-bar"><div class="ow-title">🎛️ لوحة المالك</div><div style="display:flex;align-items:center;gap:10px"><span class="live">مباشر</span><button class="ob ghost" style="padding:6px 12px;font-size:11px" onclick="go('s-land')">خروج</button></div></div>
+    <div class="oc" id="sb-cfg" style="background:rgba(192,144,16,.05);border-color:rgba(192,144,16,.18)">
       <div class="oc-lbl">⚙️ ربط Supabase</div>
       <div class="sb-note"><strong>supabase.com</strong> → مشروع جديد → Settings → API → انسخ URL + anon key</div>
       <input class="oi" id="sb-url" placeholder="https://xxxx.supabase.co" type="url">
       <input class="oi" id="sb-key" placeholder="eyJ... (anon key)" style="margin-bottom:8px">
       <div style="display:flex;gap:7px"><button class="ob gold" style="flex:1;padding:12px" onclick="connectSB()">🔗 اتصل</button><button class="ob ghost" style="flex:1;padding:12px" onclick="enableDemo()">🎮 تجربة محلية</button></div>
-      <div id="sb-st" style="font-size:11px;text-align:center;margin-top:7px;color:var(--muted)"></div>
+      <div id="sb-st" style="font-size:11px;text-align:center;margin-top:7px;color:var(--mu)"></div>
     </div>
-
-    <!-- Question Bank -->
     <div class="oc" id="oc-qbank" style="display:none">
       <div class="oc-lbl">📚 بنك الأسئلة (<span id="q-count">0</span>)</div>
-      <div style="background:rgba(184,138,10,.05);border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid rgba(184,138,10,.1)">
+      <div style="background:rgba(192,144,16,.05);border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid rgba(192,144,16,.1)">
         <div class="oc-lbl" style="margin-bottom:8px">➕ سؤال جديد</div>
-        <div class="upz" onclick="document.getElementById('q-img-f').click()">
-          <input type="file" id="q-img-f" accept="image/*" style="display:none" onchange="previewImg(event)">
-          <div id="q-img-prev"><div style="font-size:28px">📷</div><p>انقر لرفع صورة السؤال</p></div>
+        <div class="oc-lbl">محتوى السؤال</div>
+        <div class="type-tog" style="margin-bottom:10px">
+          <button class="type-btn on" id="ct-img" onclick="setCT('image')">🖼️ صورة</button>
+          <button class="type-btn"    id="ct-txt" onclick="setCT('text')">📝 نص</button>
         </div>
+        <div id="qc-img">
+          <div class="upz" onclick="document.getElementById('q-img-f').click()">
+            <input type="file" id="q-img-f" accept="image/*" style="display:none" onchange="prevImg(event)">
+            <div id="q-img-prev"><div style="font-size:28px">📷</div><p>انقر لرفع صورة السؤال</p></div>
+          </div>
+        </div>
+        <div id="qc-txt" style="display:none"><input class="oi" id="q-txt-c" type="text" placeholder="نص السؤال..."></div>
         <div class="oc-lbl">نوع الإجابة</div>
-        <div class="type-toggle">
-          <button class="type-btn on" id="tt-text" onclick="setQType('text')">✏️ نص حر</button>
-          <button class="type-btn" id="tt-mcq" onclick="setQType('mcq')">☑️ اختيار من متعدد</button>
+        <div class="type-tog">
+          <button class="type-btn on" id="at-text" onclick="setAT('text')">✏️ نص حر</button>
+          <button class="type-btn"    id="at-mcq"  onclick="setAT('mcq')">☑️ اختيار</button>
         </div>
-        <div id="qa-text">
-          <input class="oi" id="q-answer" type="text" placeholder="المثل الصحيح (الإجابة)">
-          <input class="oi" id="q-hint" type="text" placeholder="تلميح اختياري" style="margin-bottom:0">
-        </div>
-        <div id="qa-mcq" style="display:none">
-          <div id="mcq-container"></div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:8px">اضغط ✓ لتحديد الإجابة الصحيحة</div>
-        </div>
+        <div id="qa-text"><input class="oi" id="q-ans" type="text" placeholder="الإجابة الصحيحة"><input class="oi" id="q-hint" type="text" placeholder="تلميح اختياري" style="margin-bottom:0"></div>
+        <div id="qa-mcq" style="display:none"><div id="mcq-c"></div><div style="font-size:11px;color:var(--mu);margin-bottom:8px">اضغط ✓ لتحديد الإجابة الصحيحة</div></div>
         <button class="ob gold" style="width:100%;padding:12px;margin-top:8px" onclick="addQ()">✓ أضف السؤال</button>
       </div>
-      <div id="qbank-list"><div style="font-size:12px;color:var(--muted);padding:8px 0;text-align:center">لا توجد أسئلة بعد</div></div>
+      <div id="qbank-list"><div style="font-size:12px;color:var(--mu);padding:8px 0;text-align:center">لا توجد أسئلة بعد</div></div>
     </div>
-
-    <!-- Sessions -->
     <div class="oc" id="oc-sess" style="display:none">
       <div class="oc-lbl">🎫 الجلسات</div>
+      <div style="margin-bottom:12px">
+        <div class="oc-lbl">⏱️ وقت الإجابة لكل سؤال (الوقت المتبقي = النقاط ⚡)</div>
+        <div class="timer-btns">
+          <button class="tbtn on" onclick="pickT(this,10)">10 ث</button>
+          <button class="tbtn"    onclick="pickT(this,20)">20 ث</button>
+          <button class="tbtn"    onclick="pickT(this,30)">30 ث</button>
+          <button class="tbtn"    onclick="pickT(this,60)">60 ث</button>
+        </div>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:7px;margin-bottom:10px;align-items:end">
         <div><div class="oc-lbl" style="margin-bottom:4px">اسم العميل</div><input class="oi" id="new-client" placeholder="شركة X" style="margin-bottom:0"></div>
         <div><div class="oc-lbl" style="margin-bottom:4px">عدد الأسئلة</div><input class="oi" id="new-qcount" type="number" min="1" max="20" value="5" style="margin-bottom:0"></div>
         <button class="ob gold" style="padding:11px 14px;white-space:nowrap" onclick="createSession()">✨ إنشاء</button>
       </div>
-      <div id="sess-list"><div style="font-size:12px;color:var(--muted);text-align:center;padding:8px 0">لا توجد جلسات</div></div>
+      <div id="sess-list"><div style="font-size:12px;color:var(--mu);text-align:center;padding:8px 0">لا توجد جلسات</div></div>
     </div>
   </div>
 </div>
