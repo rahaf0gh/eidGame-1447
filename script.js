@@ -154,11 +154,24 @@ async function clientJoin(){
   if(!/^\d{4}$/.test(code)){toast('❗ الكود 4 أرقام');return;}
   let sd=null,isAdm=false;
   if(G.sb&&!G.demo){
+    // 1) ابحث بعمود admin_code المنفصل
     const {data:aRow}=await G.sb.from('sessions').select('*').eq('admin_code',code).maybeSingle();
-    if(aRow){sd=aRow;isAdm=true;G.playerCode=aRow.code;}
-    else{const {data:pRow,error}=await G.sb.from('sessions').select('*').eq('code',code).maybeSingle();if(error||!pRow){toast('❌ الكود غير موجود');return;}sd=pRow;isAdm=false;G.playerCode=code;}
+    if(aRow){
+      sd=aRow;isAdm=true;G.playerCode=aRow.code;
+    } else {
+      // 2) ابحث داخل JSON state->adminCode (للجلسات القديمة)
+      const {data:jRow}=await G.sb.from('sessions').select('*').filter('state->>adminCode','eq',code).maybeSingle();
+      if(jRow){
+        sd=jRow;isAdm=true;G.playerCode=jRow.code;
+      } else {
+        // 3) ابحث بكود اللاعبين (مشاهد)
+        const {data:pRow,error}=await G.sb.from('sessions').select('*').eq('code',code).maybeSingle();
+        if(error||!pRow){toast('❌ الكود غير موجود');return;}
+        sd=pRow;isAdm=false;G.playerCode=code;
+      }
+    }
   } else {
-    const byA=G.sessions.find(s=>s.admin_code===code);
+    const byA=G.sessions.find(s=>s.admin_code===code||s.state?.adminCode===code);
     if(byA){sd=byA;isAdm=true;G.playerCode=byA.code;}
     else{const byP=G.sessions.find(s=>s.code===code);if(!byP){toast('❌ الكود غير موجود');return;}sd=byP;isAdm=false;G.playerCode=code;}
   }
