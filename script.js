@@ -93,8 +93,19 @@ async function createSession(){
   const shuffled=[...G.qBank].sort(()=>Math.random()-.5);
   const picked=shuffled.slice(0,Math.min(qc,shuffled.length));
   const pCode=genCode();let aCode=genCode();while(aCode===pCode)aCode=genCode();
-  const init={phase:'lobby',qIndex:0,redScore:0,blueScore:0,redPlayers:[],bluePlayers:[],history:[],questions:picked,answers:{},revealedAnswer:null,adminCode:aCode,timerSeconds:G.pendingTimer};
-  if(G.sb&&!G.demo){const {error}=await G.sb.from('sessions').insert({code:pCode,admin_code:aCode,client_label:label,timer_seconds:G.pendingTimer,state:init});if(error){toast('❌ '+error.message);return;}}
+const init={
+  phase:'lobby',
+  qIndex:0,
+  redScore:0,
+  blueScore:0,
+  redPlayers:[],
+  bluePlayers:[],
+  history:[],
+  questions:picked,
+  answers:{},
+  revealedAnswer:null,
+  timerSeconds:G.pendingTimer
+};  if(G.sb&&!G.demo){const {error}=await G.sb.from('sessions').insert({code:pCode,admin_code:aCode,client_label:label,timer_seconds:G.pendingTimer,state:init});if(error){toast('❌ '+error.message);return;}}
   G.sessions.unshift({code:pCode,admin_code:aCode,client_label:label,state:init});renderSessions();
   document.getElementById('new-client').value='';
   const url=location.href.split('?')[0];
